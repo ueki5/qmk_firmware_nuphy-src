@@ -38,7 +38,7 @@
     "rgb_matrix": {
       "driver": "ws2812",
       "center_point": [80, 20],
-      "max_brightness": 190,
+      "max_brightness": 228,
       "val_steps": 38,
       "speed_steps": 52,
         "animations": {

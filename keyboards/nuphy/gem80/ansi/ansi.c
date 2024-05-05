@@ -682,6 +682,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record)
             }
             return false;
 
+        case RGB_VAI:
+
+            if(rgb_matrix_config.hsv.v == RGB_MATRIX_MAXIMUM_BRIGHTNESS - RGB_MATRIX_VAL_STEP * 2) {
+                if(dev_info.link_mode == LINK_USB) {
+                   rgb_matrix_increase_val(); 
+                } 
+                return true;
+            }
+            else if(rgb_matrix_config.hsv.v == RGB_MATRIX_MAXIMUM_BRIGHTNESS - RGB_MATRIX_VAL_STEP) {
+                return false;
+            }
+            return true;
+
+        case RGB_VAD:
+            if(rgb_matrix_config.hsv.v == RGB_MATRIX_MAXIMUM_BRIGHTNESS) {
+                rgb_matrix_decrease_val(); 
+            }
+            return true;
+
         default:
             return true;
     }
