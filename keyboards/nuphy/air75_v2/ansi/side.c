@@ -47,7 +47,7 @@ uint8_t side_play_point     = 0;
 uint8_t side_play_cnt       = 0;
 uint32_t side_play_timer    = 0;
 uint8_t r_temp, g_temp, b_temp;
-LED_TYPE side_leds[SIDE_LED_NUM] = {0};
+rgb_led_t side_leds[SIDE_LED_NUM] = {0};
 
 const uint8_t side_speed_table[5][5] = {
     [SIDE_WAVE]   = {10, 14, 20, 28, 38}, //
@@ -83,7 +83,7 @@ extern bool            f_bat_hold;
 extern bool            f_sys_show;
 extern bool            f_sleep_show;
 
-void side_ws2812_setleds(LED_TYPE *ledarray, uint16_t leds);
+void side_ws2812_setleds(rgb_led_t *ledarray, uint16_t leds);
 void rgb_matrix_update_pwm_buffers(void);
 
 /**

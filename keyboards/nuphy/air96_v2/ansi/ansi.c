@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ansi.h"
 #include "usb_main.h"
+#include "rf_driver.h"
 
 
 #define RF_LONG_PRESS_DELAY   30
@@ -84,6 +85,7 @@ extern uint8_t side_speed;
 extern uint8_t side_rgb;    
 extern uint8_t side_colour;  
 extern report_keyboard_t *keyboard_report;
+extern report_nkro_t *nkro_report;
 extern uint8_t uart_bit_report_buf[32];
 extern uint8_t bitkb_report_buf[32];
 extern uint8_t bytekb_report_buf[8];
@@ -211,8 +213,8 @@ void m_break_all_key(void)
     clear_keyboard();
 
     keymap_config.nkro = 1;
-    memset(keyboard_report, 0, sizeof(report_keyboard_t));
-    host_keyboard_send(keyboard_report);
+    memset(nkro_report, 0, sizeof(report_nkro_t));
+    host_nkro_send(nkro_report);
     wait_ms(10);
 
     keymap_config.nkro = 0;
@@ -255,7 +257,7 @@ static void switch_dev_link(uint8_t mode)
     }
     else {
         host_mode = HOST_RF_TYPE; 
-        host_set_driver(0);           
+        host_set_driver(&rf_host_driver);           
 
     }
 }
@@ -330,7 +332,7 @@ void dial_sw_scan(void)
         f_first           = false;
 
         if (dev_info.link_mode != LINK_USB) {
-            host_set_driver(0);
+            host_set_driver(&rf_host_driver);
         }
     }
 }

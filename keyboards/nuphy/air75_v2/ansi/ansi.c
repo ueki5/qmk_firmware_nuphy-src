@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ansi.h"
 #include "usb_main.h"
+#include "rf_driver.h"
 
 user_config_t user_config;
 DEV_INFO_STRUCT dev_info = {
@@ -25,6 +26,7 @@ DEV_INFO_STRUCT dev_info = {
     .rf_state   = RF_IDLE,
 };
 
+bool f_uart_ack         = 0;
 bool f_bat_hold         = 0;
 bool f_sys_show         = 0;
 bool f_sleep_show       = 0;
@@ -34,6 +36,13 @@ bool f_rf_sw_press      = 0;
 bool f_dev_reset_press  = 0;
 bool f_rgb_test_press   = 0;
 bool f_bat_num_show     = 0;
+bool f_rf_hand_ok       = 0;
+bool f_goto_sleep       = 0;
+bool f_rf_read_data_ok  = 0;
+bool f_rf_sts_sysc_ok   = 0;
+bool f_rf_new_adv_ok    = 0;
+bool f_rf_reset         = 0;
+bool f_wakeup_prepare   = 0;
 
 uint16_t       rf_linking_time       = 0;
 uint16_t       rf_link_show_time     = 0;
@@ -48,6 +57,7 @@ host_driver_t *m_host_driver         = 0;
 
 extern bool               f_rf_new_adv_ok;
 extern report_keyboard_t *keyboard_report;
+extern report_nkro_t *nkro_report;
 extern uint8_t            bitkb_report_buf[32];
 extern uint8_t            bytekb_report_buf[8];
 extern uint8_t            side_mode;
@@ -197,8 +207,8 @@ void break_all_key(void) {
     clear_keyboard();
 
     keymap_config.nkro = 1;
-    memset(keyboard_report, 0, sizeof(report_keyboard_t));
-    host_keyboard_send(keyboard_report);
+    memset(nkro_report, 0, sizeof(report_nkro_t));
+    host_nkro_send(nkro_report);
     wait_ms(10);
 
     keymap_config.nkro = 0;
@@ -241,7 +251,7 @@ void switch_dev_link(uint8_t mode) {
     } else {
         host_mode = HOST_RF_TYPE;
 
-        host_set_driver(0);
+        host_set_driver(&rf_host_driver);
     }
 }
 
@@ -314,7 +324,7 @@ void dial_sw_scan(void) {
         f_first           = false;
 
         if (dev_info.link_mode != LINK_USB) {
-            host_set_driver(0);
+            host_set_driver(&rf_host_driver);
         }
     }
 }

@@ -77,8 +77,8 @@ extern uint16_t     rf_link_show_time;
 extern uint8_t      logo_play_cnt; 
 extern uint32_t     logo_play_timer;
 
-LED_TYPE side_leds[SIDE_LED_NUM] = {0};
-void side_ws2812_setleds(LED_TYPE *ledarray, uint16_t leds);
+rgb_led_t side_leds[SIDE_LED_NUM] = {0};
+void side_ws2812_setleds(rgb_led_t *ledarray, uint16_t leds);
 void rgb_matrix_update_pwm_buffers(void);
 void m_logo_led_show(void);
 

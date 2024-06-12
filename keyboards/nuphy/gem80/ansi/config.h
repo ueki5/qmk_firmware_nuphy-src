@@ -30,6 +30,6 @@
 #define SD1_RX_PAL_MODE          	0
 #define RGB_MATRIX_DEFAULT_MODE     RGB_MATRIX_CUSTOM_position_mode
 #define RGB_DEFAULT_COLOUR          168
-#define RGB_DISABLE_WHEN_USB_SUSPENDED
+#define RGB_MATRIX_SLEEP
 
 

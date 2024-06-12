@@ -133,7 +133,7 @@ typedef enum {
 
 #define RF_LONG_PRESS_DELAY     30
 #define DEV_RESET_PRESS_DELAY   30
-#define RGB_TEST_PRESS_DELAY  30
+#define RGB_TEST_PRESS_DELAY    30
 
 typedef struct
 {

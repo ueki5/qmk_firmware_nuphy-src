@@ -14,7 +14,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include "ansi.h"
 #include "uart.h"  // qmk uart.h
 #include "rf_driver.h"
@@ -59,7 +58,7 @@ void           uart_send_report(uint8_t report_type, uint8_t *report_buf, uint8_
 void           UART_Send_Bytes(uint8_t *Buffer, uint32_t Length);
 uint8_t        get_checksum(uint8_t *buf, uint8_t len);
 void           uart_receive_pro(void);
-void           break_all_key(void);
+void           m_break_all_key(void);
 uint16_t       host_last_consumer_usage(void);
 
 /**
@@ -135,7 +134,7 @@ void uart_send_report_func(void)
     if (dev_info.link_mode == LINK_USB) return;
     keyboard_protocol          = 1;
 
-    if (timer_elapsed32(interval_timer) > 50) {
+    if (timer_elapsed32(interval_timer) > 300) {
         interval_timer = timer_read32();
         if (no_act_time <= 2000) {
             uart_send_report(CMD_RPT_BYTE_KB, bytekb_report_buf, 8);
@@ -370,56 +369,57 @@ uint8_t uart_send_cmd(uint8_t cmd, uint8_t wait_ack, uint8_t delayms) {
             Usart_Mgr.TXDBuf[5] = POWER_DOWN_DELAY;
             break;
         }
-
         case CMD_SET_NAME: {
-            Usart_Mgr.TXDBuf[3]  = 17;
-            Usart_Mgr.TXDBuf[4]  = 1;
-            Usart_Mgr.TXDBuf[5]  = 15;
+            Usart_Mgr.TXDBuf[3]  = 18;
+            Usart_Mgr.TXDBuf[4]  = 1;  
+            Usart_Mgr.TXDBuf[5]  = 16;   
             Usart_Mgr.TXDBuf[6]  = 'N';
             Usart_Mgr.TXDBuf[7]  = 'u';
             Usart_Mgr.TXDBuf[8]  = 'P';
             Usart_Mgr.TXDBuf[9]  = 'h';
             Usart_Mgr.TXDBuf[10] = 'y';
             Usart_Mgr.TXDBuf[11] = ' ';
-            Usart_Mgr.TXDBuf[12] = 'A';
-            Usart_Mgr.TXDBuf[13] = 'i';
-            Usart_Mgr.TXDBuf[14] = 'r';
-            Usart_Mgr.TXDBuf[15] = '7';
-            Usart_Mgr.TXDBuf[16] = '5';
-            Usart_Mgr.TXDBuf[17] = ' ';
-            Usart_Mgr.TXDBuf[18] = 'V';
-            Usart_Mgr.TXDBuf[19] = '2';
-            Usart_Mgr.TXDBuf[20] = '-';
-            Usart_Mgr.TXDBuf[21] = get_checksum(Usart_Mgr.TXDBuf + 4, Usart_Mgr.TXDBuf[3]);
+            Usart_Mgr.TXDBuf[12] = 'H';
+            Usart_Mgr.TXDBuf[13] = 'a';
+            Usart_Mgr.TXDBuf[14] = 'l';
+            Usart_Mgr.TXDBuf[15] = 'o';
+            Usart_Mgr.TXDBuf[16] = '7';
+            Usart_Mgr.TXDBuf[17] = '5';
+            Usart_Mgr.TXDBuf[18] = ' ';   
+            Usart_Mgr.TXDBuf[19] = 'V';   
+            Usart_Mgr.TXDBuf[20] = '2';   
+            Usart_Mgr.TXDBuf[21] = '-';   
+            Usart_Mgr.TXDBuf[22] = get_checksum(Usart_Mgr.TXDBuf + 4, Usart_Mgr.TXDBuf[3]);  // sum
             break;
         }
 
         case CMD_SET_24G_NAME: {
-            Usart_Mgr.TXDBuf[3]  = 44;  // uart data len
-            Usart_Mgr.TXDBuf[4]  = 44;  // name valid len
-            Usart_Mgr.TXDBuf[5]  = 3;   // 固定
+            Usart_Mgr.TXDBuf[3]  = 46;
+            Usart_Mgr.TXDBuf[4]  = 46;
+            Usart_Mgr.TXDBuf[5]  = 3;      
             Usart_Mgr.TXDBuf[6]  = 'N';
             Usart_Mgr.TXDBuf[8]  = 'u';
             Usart_Mgr.TXDBuf[10] = 'P';
             Usart_Mgr.TXDBuf[12] = 'h';
             Usart_Mgr.TXDBuf[14] = 'y';
             Usart_Mgr.TXDBuf[16] = ' ';
-            Usart_Mgr.TXDBuf[18] = 'A';
-            Usart_Mgr.TXDBuf[20] = 'i';
-            Usart_Mgr.TXDBuf[22] = 'r';
-            Usart_Mgr.TXDBuf[24] = '7';
-            Usart_Mgr.TXDBuf[26] = '5';
-            Usart_Mgr.TXDBuf[28] = ' ';
-            Usart_Mgr.TXDBuf[30] = 'V';
-            Usart_Mgr.TXDBuf[32] = '2';
-            Usart_Mgr.TXDBuf[34] = ' ';
-            Usart_Mgr.TXDBuf[36] = 'D';
-            Usart_Mgr.TXDBuf[38] = 'o';
-            Usart_Mgr.TXDBuf[40] = 'n';
-            Usart_Mgr.TXDBuf[42] = 'g';
-            Usart_Mgr.TXDBuf[44] = 'l';
-            Usart_Mgr.TXDBuf[46] = 'e';
-            Usart_Mgr.TXDBuf[48] = get_checksum(Usart_Mgr.TXDBuf + 4, Usart_Mgr.TXDBuf[3]);  // sum
+            Usart_Mgr.TXDBuf[18] = 'H';
+            Usart_Mgr.TXDBuf[20] = 'a';
+            Usart_Mgr.TXDBuf[22] = 'l';
+            Usart_Mgr.TXDBuf[24] = 'o';
+            Usart_Mgr.TXDBuf[26] = '7';
+            Usart_Mgr.TXDBuf[28] = '5';
+            Usart_Mgr.TXDBuf[30] = ' ';
+            Usart_Mgr.TXDBuf[32] = 'V';
+            Usart_Mgr.TXDBuf[34] = '2';
+            Usart_Mgr.TXDBuf[36] = ' ';
+            Usart_Mgr.TXDBuf[38] = 'D';
+            Usart_Mgr.TXDBuf[40] = 'o';
+            Usart_Mgr.TXDBuf[42] = 'n';
+            Usart_Mgr.TXDBuf[44] = 'g';
+            Usart_Mgr.TXDBuf[46] = 'l';
+            Usart_Mgr.TXDBuf[48] = 'e';
+            Usart_Mgr.TXDBuf[50] = get_checksum(Usart_Mgr.TXDBuf + 4, Usart_Mgr.TXDBuf[3]);  // sum
             break;
         }
 
@@ -486,14 +486,14 @@ void dev_sts_sync(void) {
         if (host_mode != HOST_USB_TYPE) {
             host_mode = HOST_USB_TYPE;
             host_set_driver(m_host_driver);
-            break_all_key();
+            m_break_all_key();
         }
         rf_blink_cnt = 0;
     }
     else {
         if (host_mode != HOST_RF_TYPE) {
             host_mode = HOST_RF_TYPE;
-            break_all_key();
+            m_break_all_key();
             host_set_driver(&rf_host_driver);
         }
 
@@ -515,9 +515,8 @@ void dev_sts_sync(void) {
                 link_state_temp   = RF_CONNECT;
                 rf_link_show_time = 0;
                 if (dev_info.link_mode == LINK_RF_24) {
-                    uart_send_cmd(CMD_SET_24G_NAME, 10, 30);   
+                    uart_send_cmd(CMD_SET_24G_NAME, 10, 30);
                 }
-
             }
         }
     }
@@ -530,6 +529,34 @@ void dev_sts_sync(void) {
             f_rf_reset = 1;
         }
     }
+}
+
+#define BAT_CFG_LEN     80
+const uint8_t battery_acfg_tab[BAT_CFG_LEN] = {
+    0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0xB4, 0xC2, 0xB4, 0xA8, 0x9B, 0x96, 0xF8, 0xF2,
+    0xF3, 0xC3, 0xA8, 0x8A, 0x65, 0x55, 0x49, 0x41,
+    0x39, 0x34, 0x2E, 0xA9, 0xAE, 0xD3, 0x28, 0xFF,
+    0xFF, 0xF1, 0xD3, 0xCE, 0xCB, 0xC8, 0xC3, 0xB8,
+    0xAE, 0xA7, 0xA8, 0xA6, 0x82, 0x6D, 0x65, 0x63,
+    0x69, 0x79, 0x8D, 0xA4, 0xB7, 0xC8, 0xA4, 0x16,
+    0x20, 0x00, 0xA7, 0x10, 0x00, 0xB1, 0x28, 0x00,
+    0x00, 0x00, 0x64, 0x43, 0xC0, 0x53, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x81,  
+};
+
+void UART_Send_BatCfg(void) 
+{
+    uint8_t buf[128] = {0};
+
+    buf[0] = UART_HEAD;       
+    buf[1] = CMD_WBAT_CFG; 
+    buf[2] = 0x01;           
+    buf[3] = BAT_CFG_LEN;   
+    memcpy(&buf[4], battery_acfg_tab, BAT_CFG_LEN);
+    buf[4 + BAT_CFG_LEN] = get_checksum(&buf[4], BAT_CFG_LEN);
+    UART_Send_Bytes(buf, BAT_CFG_LEN + 5);
+    wait_ms(50);
 }
 
 /**
@@ -672,6 +699,8 @@ void rf_device_init(void) {
         uart_receive_pro();
         if (f_rf_sts_sysc_ok) break;
     }
+
+    UART_Send_BatCfg();
 
     uart_send_cmd(CMD_SET_NAME, 10, 20);
 
